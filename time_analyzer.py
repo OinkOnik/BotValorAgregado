@@ -1,4 +1,6 @@
-#time_analyzer.py
+# time_analyzer.py
+# Funciones para analizar tiempos de servicio
+# Calcula duraciones, identifica anomalías y genera estadísticas
 
 import pandas as pd
 import numpy as np

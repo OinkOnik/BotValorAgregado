@@ -4,16 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43b30518-c394-4bf2-a03d-9d28a3152428" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/BotValorAgregado.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data_loader.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gui_time_analysis.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/time_analyzer.py" afterDir="false" />
+    <list default="true" id="43b30518-c394-4bf2-a03d-9d28a3152428" name="Changes" comment="Primera version estable del bot">
+      <change afterPath="$PROJECT_DIR$/gui_components.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gui_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/gui_tabs.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pdf_charts.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pdf_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_loader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui_time_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui_time_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/time_analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/time_analyzer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +24,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "OinkOnik"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/OinkOnik/BotValorAgregado.git",
+    "accountId": "9e51f872-56da-4df0-8cdc-ef5c4c86336a"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 3
 }]]></component>
@@ -58,6 +71,19 @@
       <option name="presentableId" value="Default" />
       <updated>1745869297533</updated>
     </task>
+    <task id="LOCAL-00001" summary="Primera version estable del bot">
+      <option name="closed" value="true" />
+      <created>1745873097286</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1745873097286</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Primera version estable del bot" />
+    <option name="LAST_COMMIT_MESSAGE" value="Primera version estable del bot" />
   </component>
 </project>

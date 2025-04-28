@@ -1,4 +1,7 @@
 # data_loader.py
+# Funciones para cargar y limpiar datos de archivos Excel
+# Maneja la carga de archivos, limpieza de datos y validación de columnas
+
 import pandas as pd
 import os
 
