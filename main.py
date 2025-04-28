@@ -5,7 +5,7 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication
-from gui_main import TimeAnalysisWindow
+from time_analysis_window import TimeAnalysisWindow
 
 
 # Aseguramos que las dependencias necesarias estén disponibles
