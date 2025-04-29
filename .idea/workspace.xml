@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43b30518-c394-4bf2-a03d-9d28a3152428" name="Changes" comment="Actualizacion de modularizacion version estable">
+    <list default="true" id="43b30518-c394-4bf2-a03d-9d28a3152428" name="Changes" comment="Inicio desde 0">
+      <change afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui_components.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui_components.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui_tabs.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui_tabs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pdf_charts.py" beforeDir="false" afterPath="$PROJECT_DIR$/pdf_charts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pdf_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/pdf_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tab_widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/tab_widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +81,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745876100978</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Inicio desde 0">
+      <option name="closed" value="true" />
+      <created>1745933132777</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1745933132777</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -101,6 +106,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Primera version estable del bot" />
     <MESSAGE value="Actualizacion de modularizacion version estable" />
-    <option name="LAST_COMMIT_MESSAGE" value="Actualizacion de modularizacion version estable" />
+    <MESSAGE value="Inicio desde 0" />
+    <option name="LAST_COMMIT_MESSAGE" value="Inicio desde 0" />
   </component>
 </project>
