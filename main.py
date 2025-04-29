@@ -1,7 +1,7 @@
 # main.py
 # Archivo principal que ejecuta la aplicación del Bot para procesar datos Excel y generar informes PDF
 
-import tkinter as tk
+from ttkthemes import ThemedTk
 from tkinter import messagebox
 from gui import create_main_window
 from excel_processor import process_excel_file
@@ -12,8 +12,8 @@ def main():
     """
     Función principal que inicia la aplicación
     """
-    root = tk.Tk()
-    root.title("Bot Procesador Excel a PDF")
+    root = ThemedTk(theme="arc")  # Usamos el tema 'arc' para un aspecto moderno
+    root.title("Visor Técnico Bot")
 
     # Inicializar la interfaz gráfica
     create_main_window(root, process_data)
