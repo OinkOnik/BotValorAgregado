@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43b30518-c394-4bf2-a03d-9d28a3152428" name="Changes" comment="Primera version estable del bot">
+    <list default="true" id="43b30518-c394-4bf2-a03d-9d28a3152428" name="Changes" comment="Mejoramiento definitivo del PDF">
+      <change afterPath="$PROJECT_DIR$/pdf_canvas.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pdf_elements.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pdf_styles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pdf_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/pdf_generator.py" afterDir="false" />
     </list>
@@ -97,7 +100,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745935223469</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Mejoramiento definitivo del PDF">
+      <option name="closed" value="true" />
+      <created>1745953585532</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1745953585532</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -115,6 +126,7 @@
     <MESSAGE value="Actualizacion de modularizacion version estable" />
     <MESSAGE value="Inicio desde 0" />
     <MESSAGE value="Primera version estable del bot" />
-    <option name="LAST_COMMIT_MESSAGE" value="Primera version estable del bot" />
+    <MESSAGE value="Mejoramiento definitivo del PDF" />
+    <option name="LAST_COMMIT_MESSAGE" value="Mejoramiento definitivo del PDF" />
   </component>
 </project>
