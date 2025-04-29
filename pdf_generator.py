@@ -3,7 +3,7 @@
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 import os
@@ -35,6 +35,12 @@ def generate_pdf_report(data, output_path):
     styles = getSampleStyleSheet()
     title_style = styles['Heading1']
     subtitle_style = styles['Heading2']
+    subsubtitle_style = ParagraphStyle(
+        'SubSubTitle',
+        parent=styles['Heading3'],
+        fontSize=12,
+        spaceAfter=6
+    )
     normal_style = styles['Normal']
     note_style = ParagraphStyle(
         'NoteStyle',
@@ -71,6 +77,19 @@ def generate_pdf_report(data, output_path):
     )
     elements.append(anomaly_note)
     elements.append(Spacer(1, 0.25 * inch))
+
+    # Verificar si existe el análisis de afiliados
+    if 'afiliados_analysis' in data:
+        # Agregar sección de análisis de afiliados con problemas
+        add_affiliates_analysis_section(elements, data['afiliados_analysis'],
+                                        subtitle_style, subsubtitle_style,
+                                        normal_style, header_style)
+
+        # Eliminar el análisis de afiliados del diccionario para que no interfiera con el bucle de oficiales
+        afiliados_data = data.pop('afiliados_analysis')
+
+        # Añadir un salto de página después del análisis de afiliados
+        elements.append(Spacer(1, 0.5 * inch))
 
     # Para cada oficial técnico, generar una sección con sus datos
     for officer, officer_data in data.items():
@@ -170,3 +189,100 @@ def generate_pdf_report(data, output_path):
     doc.build(elements)
 
     return output_path
+
+
+def add_affiliates_analysis_section(elements, afiliados_data, subtitle_style,
+                                    subsubtitle_style, normal_style, header_style):
+    """
+    Agrega la sección de análisis de afiliados al reporte PDF
+
+    Args:
+        elements: Lista de elementos del PDF
+        afiliados_data: Datos del análisis de afiliados
+        subtitle_style, etc.: Estilos para el formato
+    """
+    if not afiliados_data or 'top_afiliados' not in afiliados_data:
+        return
+
+    # Título de la sección
+    section_title = Paragraph("Análisis de Afiliados con Problemas", subtitle_style)
+    elements.append(section_title)
+    elements.append(Spacer(1, 0.2 * inch))
+
+    # Descripción
+    description = Paragraph(
+        f"Esta sección muestra los afiliados que presentan más casos o problemas. "
+        f"Se analizaron un total de {afiliados_data['total_afiliados']} afiliados.",
+        normal_style
+    )
+    elements.append(description)
+    elements.append(Spacer(1, 0.2 * inch))
+
+    # Para cada afiliado en el top, crear una subsección
+    for i, afiliado in enumerate(afiliados_data['top_afiliados']):
+        # Mantener junto todo el contenido de un afiliado
+        afiliado_elements = []
+
+        # Subtítulo con el nombre del afiliado y el total de casos
+        afiliado_title = Paragraph(
+            f"{i + 1}. {afiliado['nombre']} ({afiliado['total_casos']} casos)",
+            subsubtitle_style
+        )
+        afiliado_elements.append(afiliado_title)
+
+        # Crear tabla para las razones principales
+        if afiliado['razones']:
+            # Encabezados
+            headers = [["Razón del problema", "Frecuencia"]]
+
+            # Datos de la tabla
+            table_data = []
+            for razon_info in afiliado['razones']:
+                table_data.append([razon_info['razon'], str(razon_info['frecuencia'])])
+
+            # Combinar encabezados y datos
+            all_data = headers + table_data
+
+            # Crear tabla
+            razones_table = Table(all_data, colWidths=[4 * inch, 1 * inch])
+
+            # Estilo de la tabla
+            table_style = [
+                # Encabezados
+                ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+
+                # Datos
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('ALIGN', (1, 1), (1, -1), 'CENTER'),  # Centrar frecuencia
+
+                # Bordes
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ]
+
+            # Colores alternados para las filas
+            for i in range(1, len(all_data)):
+                if i % 2 == 0:
+                    table_style.append(('BACKGROUND', (0, i), (-1, i), colors.lightgrey))
+                else:
+                    table_style.append(('BACKGROUND', (0, i), (-1, i), colors.white))
+
+            razones_table.setStyle(TableStyle(table_style))
+            afiliado_elements.append(razones_table)
+        else:
+            # Si no hay razones, mostrar un mensaje
+            no_reasons = Paragraph("No se encontraron razones específicas registradas.", normal_style)
+            afiliado_elements.append(no_reasons)
+
+        # Espaciador
+        afiliado_elements.append(Spacer(1, 0.15 * inch))
+
+        # Mantener todos los elementos de este afiliado juntos
+        elements.append(KeepTogether(afiliado_elements))
+
+    # Espaciador final
+    elements.append(Spacer(1, 0.25 * inch))
