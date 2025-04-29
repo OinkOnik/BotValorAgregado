@@ -35,9 +35,25 @@ def process_excel_file(file_path):
             return {}  # Retornar diccionario vacío en lugar de None
 
         # Asegurarse de que las columnas de tiempo sean del tipo datetime
+        # Especificamos el formato de fecha/hora para evitar warnings y mejorar la precisión
+        # Probamos múltiples formatos comunes para mayor robustez
         for col in ['Hora de llegada', 'Hora de salida']:
             if not pd.api.types.is_datetime64_any_dtype(df_filtered[col]):
-                df_filtered[col] = pd.to_datetime(df_filtered[col], errors='coerce')
+                # Intentar con diferentes formatos de hora comunes, incluido el formato "03:22 PM GMT-06:00"
+                try:
+                    # Primero intentamos con el formato específico del error
+                    df_filtered[col] = pd.to_datetime(df_filtered[col], format='%I:%M %p GMT%z', errors='raise')
+                except ValueError:
+                    # Si falla, probamos con formato de 12 horas (AM/PM)
+                    try:
+                        df_filtered[col] = pd.to_datetime(df_filtered[col], format='%I:%M %p', errors='raise')
+                    except ValueError:
+                        # Si también falla, probamos con formato de 24 horas
+                        try:
+                            df_filtered[col] = pd.to_datetime(df_filtered[col], format='%H:%M', errors='raise')
+                        except ValueError:
+                            # Si todo falla, caemos de nuevo en coerce pero ya evitamos el warning
+                            df_filtered[col] = pd.to_datetime(df_filtered[col], errors='coerce')
 
         # Filtrar filas donde la conversión de fecha/hora falló
         df_filtered = df_filtered.dropna(subset=['Hora de llegada', 'Hora de salida'])
