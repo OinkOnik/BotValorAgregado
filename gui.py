@@ -2,7 +2,7 @@
 # Módulo que contiene la interfaz gráfica para seleccionar archivos Excel y mostrar información
 
 import tkinter as tk
-from tkinter import filedialog, ttk
+from tkinter import filedialog, ttk, messagebox
 import os
 from ttkthemes import ThemedTk
 
