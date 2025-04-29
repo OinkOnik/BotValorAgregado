@@ -1,5 +1,6 @@
 # excel_processor.py
-# Módulo para procesar archivos Excel y extraer/calcular datos de tiempo de manera robusta
+# Módulo para procesar archivos Excel y extraer/calcular datos de tiempo de manera robusta,
+# incluyendo análisis de respuesta operativa
 
 import pandas as pd
 from datetime import datetime, timedelta
@@ -7,13 +8,14 @@ from datetime import datetime, timedelta
 
 def process_excel_file(file_path):
     """
-    Procesa un archivo Excel para calcular tiempos de estadía basados en hora de llegada y salida
+    Procesa un archivo Excel para calcular tiempos de estadía basados en hora de llegada y salida,
+    y extrae datos adicionales para el análisis de respuesta operativa
 
     Args:
         file_path: Ruta al archivo Excel a procesar
 
     Returns:
-        Un diccionario con datos procesados organizados por oficial técnico
+        Un diccionario con datos procesados organizados por oficial técnico y datos operativos
     """
     try:
         # Cargar el archivo Excel
@@ -60,6 +62,35 @@ def process_excel_file(file_path):
 
         # Calcular el tiempo de estadía
         df_filtered['Tiempo de estadía'] = df_filtered['Hora de salida'] - df_filtered['Hora de llegada']
+
+        # Extraer datos para el análisis de respuesta operativa
+        # Ahora recopilamos TODOS los afiliados y sus fechas
+        affiliates_data = []
+
+        # Verificar si existen las columnas de interés
+        if 'Nombre del Afiliado' in df.columns and 'Fecha de Reporte' in df.columns:
+            # Crear un DataFrame con solo las columnas de interés, eliminando duplicados
+            affiliates_df = df[['Nombre del Afiliado', 'Fecha de Reporte']].dropna(how='all')
+            affiliates_df = affiliates_df.drop_duplicates().reset_index(drop=True)
+
+            # Convertir fechas a formato adecuado
+            if 'Fecha de Reporte' in affiliates_df.columns:
+                affiliates_df['Fecha de Reporte'] = pd.to_datetime(
+                    affiliates_df['Fecha de Reporte'], errors='coerce'
+                ).dt.strftime('%d/%m/%Y')
+
+            # Reemplazar valores nulos con texto informativo
+            affiliates_df = affiliates_df.fillna('No especificado')
+
+            # Convertir el DataFrame a una lista de diccionarios
+            affiliates_data = affiliates_df.to_dict('records')
+
+            # Si no hay datos, crear un registro por defecto
+            if not affiliates_data:
+                affiliates_data = [{'Nombre del Afiliado': 'No especificado', 'Fecha de Reporte': 'No especificada'}]
+        else:
+            # Si las columnas no existen, crear un registro por defecto
+            affiliates_data = [{'Nombre del Afiliado': 'No especificado', 'Fecha de Reporte': 'No especificada'}]
 
         # Organizar los datos por oficial técnico
         result = {}
@@ -127,6 +158,11 @@ def process_excel_file(file_path):
                 'avg_time': f"{avg_hours} horas, {avg_minutes} minutos" if total_valid_records > 0 else "N/A",
                 'total_time': f"{total_hours} horas, {total_minutes} minutos" if total_valid_records > 0 else "N/A"
             }
+
+        # Agregar los datos operativos al resultado final
+        result['operational_data'] = {
+            'affiliates': affiliates_data
+        }
 
         return result
 

@@ -1,116 +1,137 @@
 # pdf_styles.py
-# Módulo que define los estilos de texto y párrafos para ser utilizados en los reportes PDF
+# Módulo que define los estilos para el documento PDF, incluyendo fuentes, tamaños, colores y alineaciones
 
-from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib.units import inch
 
 
 def get_report_styles():
     """
-    Crea y devuelve un diccionario con estilos personalizados para el reporte PDF
+    Crea y retorna un diccionario con todos los estilos necesarios para el reporte
 
     Returns:
-        dict: Diccionario con estilos para distintos elementos del PDF
+        dict: Diccionario con los estilos para el documento
     """
-    # Obtener los estilos base
+    # Obtener estilos base
     styles = getSampleStyleSheet()
 
-    # Diccionario para almacenar todos los estilos
-    report_styles = {}
+    # Estilo para el título principal
+    # Verificamos si 'title' ya existe para evitar duplicados
+    if 'report_title' not in styles:
+        styles.add(ParagraphStyle(
+            name='report_title',
+            fontName='Helvetica-Bold',
+            fontSize=18,
+            leading=22,
+            alignment=TA_CENTER,
+            textColor=colors.darkblue,
+        ))
 
-    # Estilo de título principal con color técnico
-    report_styles['title'] = ParagraphStyle(
-        'TitleStyle',
-        parent=styles['Heading1'],
-        fontName='Helvetica-Bold',
-        fontSize=20,
-        textColor=colors.HexColor('#2C3E50'),  # Azul oscuro profesional
-        alignment=TA_CENTER,
-        spaceAfter=12
-    )
+    # Estilos para encabezados (para utilizar con Paragraph en vez de ChapterHeader)
+    if 'heading1' not in styles:
+        styles.add(ParagraphStyle(
+            name='heading1',
+            fontName='Helvetica-Bold',
+            fontSize=16,
+            leading=18,
+            spaceAfter=10,
+            textColor=colors.darkblue,
+        ))
 
-    # Estilo de subtítulo
-    report_styles['subtitle'] = ParagraphStyle(
-        'SubtitleStyle',
-        parent=styles['Heading2'],
-        fontName='Helvetica-Bold',
-        fontSize=16,
-        textColor=colors.HexColor('#34495E'),  # Gris azulado
-        alignment=TA_LEFT,
-        spaceAfter=6
-    )
+    if 'heading2' not in styles:
+        styles.add(ParagraphStyle(
+            name='heading2',
+            fontName='Helvetica-Bold',
+            fontSize=14,
+            leading=16,
+            leftIndent=10,
+            spaceAfter=8,
+            textColor=colors.darkblue,
+        ))
 
-    # Estilo para secciones
-    report_styles['section'] = ParagraphStyle(
-        'SectionStyle',
-        parent=styles['Heading3'],
-        fontName='Helvetica-Bold',
-        fontSize=14,
-        textColor=colors.HexColor('#2980B9'),  # Azul claro
-        alignment=TA_LEFT,
-        spaceAfter=6
-    )
+    if 'heading3' not in styles:
+        styles.add(ParagraphStyle(
+            name='heading3',
+            fontName='Helvetica-Bold',
+            fontSize=12,
+            leading=14,
+            leftIndent=20,
+            spaceAfter=6,
+            textColor=colors.darkblue,
+        ))
 
-    # Estilo para información general
-    report_styles['info'] = ParagraphStyle(
-        'InfoStyle',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=10,
-        textColor=colors.HexColor('#2C3E50'),
-        alignment=TA_LEFT
-    )
-
-    # Estilo para notas
-    report_styles['note'] = ParagraphStyle(
-        'NoteStyle',
-        parent=styles['Italic'],
-        fontSize=9,
-        textColor=colors.HexColor('#7F8C8D'),  # Gris más suave
-        alignment=TA_LEFT
-    )
+    # Estilo para texto informativo
+    if 'info' not in styles:
+        styles.add(ParagraphStyle(
+            name='info',
+            fontName='Helvetica',
+            fontSize=11,
+            leading=13,
+            alignment=TA_LEFT
+        ))
 
     # Estilo para el título de notas
-    report_styles['notes_title'] = ParagraphStyle(
-        'NotesTitle',
-        parent=styles['Heading4'],
-        fontName='Helvetica-Bold',
-        fontSize=11,
-        textColor=colors.HexColor('#2C3E50')
-    )
+    if 'notes_title' not in styles:
+        styles.add(ParagraphStyle(
+            name='notes_title',
+            fontName='Helvetica-Bold',
+            fontSize=11,
+            leading=13,
+            alignment=TA_LEFT
+        ))
 
-    # Estilo para el índice de contenidos
-    report_styles['toc'] = ParagraphStyle(
-        'TOCStyle',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=12,
-        leading=16,
-        textColor=colors.HexColor('#34495E')
-    )
+    # Estilo para notas
+    if 'note' not in styles:
+        styles.add(ParagraphStyle(
+            name='note',
+            fontName='Helvetica',
+            fontSize=10,
+            leading=12,
+            leftIndent=10
+        ))
 
-    # Estilos para los niveles del índice
-    report_styles['toc1'] = ParagraphStyle(
-        name='TOC1',
-        parent=report_styles['toc'],
-        fontSize=14,
-        fontName='Helvetica-Bold',
-        leftIndent=0
-    )
+    # Estilo para secciones
+    if 'section' not in styles:
+        styles.add(ParagraphStyle(
+            name='section',
+            fontName='Helvetica-Bold',
+            fontSize=12,
+            leading=14,
+            textColor=colors.darkblue,
+            leftIndent=15
+        ))
 
-    report_styles['toc2'] = ParagraphStyle(
-        name='TOC2',
-        parent=report_styles['toc'],
-        fontSize=12,
-        leftIndent=10
-    )
+    # Estilos para tabla de contenidos
+    if 'toc1' not in styles:
+        styles.add(ParagraphStyle(
+            name='toc1',
+            fontName='Helvetica-Bold',
+            fontSize=12,
+            leading=16,
+            leftIndent=20,
+            firstLineIndent=-20
+        ))
 
-    report_styles['toc3'] = ParagraphStyle(
-        name='TOC3',
-        parent=report_styles['toc'],
-        fontSize=10,
-        leftIndent=20
-    )
+    if 'toc2' not in styles:
+        styles.add(ParagraphStyle(
+            name='toc2',
+            fontName='Helvetica',
+            fontSize=11,
+            leading=14,
+            leftIndent=40,
+            firstLineIndent=-20
+        ))
 
-    return report_styles
+    if 'toc3' not in styles:
+        styles.add(ParagraphStyle(
+            name='toc3',
+            fontName='Helvetica',
+            fontSize=10,
+            leading=12,
+            leftIndent=60,
+            firstLineIndent=-20
+        ))
+
+    return styles

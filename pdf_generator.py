@@ -15,7 +15,8 @@ from datetime import datetime
 # Importaciones de los módulos modularizados
 from pdf_canvas import NumberedCanvas
 from pdf_styles import get_report_styles
-from pdf_elements import ChapterHeader, create_divisor_line, create_statistics_table, create_detail_table
+from pdf_elements import create_divisor_line, create_statistics_table, create_detail_table, \
+    create_operational_data_table
 
 
 def generate_pdf_report(data, output_path):
@@ -45,44 +46,34 @@ def generate_pdf_report(data, output_path):
     # Obtener los estilos para el reporte
     styles = get_report_styles()
 
-    # Crear el índice de contenidos
-    toc = _create_table_of_contents(styles)
-
     # Añadir título y fecha al reporte
     _add_report_header(elements, styles)
 
-    # Añadir el índice de contenidos
-    _add_table_of_contents(elements, toc)
-
-    # Añadir sección de resumen y notas
-    _add_summary_section(elements, styles)
-
-    # Añadir sección principal de datos
-    _add_data_section(elements, data, styles)
-
-    # Generar el PDF con numeración de páginas
-    doc.build(elements, canvasmaker=NumberedCanvas)
-
-    return output_path
-
-
-def _create_table_of_contents(styles):
-    """
-    Crea el objeto de tabla de contenidos con los estilos adecuados
-
-    Args:
-        styles: Diccionario con los estilos del reporte
-
-    Returns:
-        TableOfContents: Objeto para la tabla de contenidos
-    """
+    # Crear el índice de contenidos
     toc = TableOfContents()
     toc.levelStyles = [
         styles['toc1'],
         styles['toc2'],
         styles['toc3']
     ]
-    return toc
+    elements.append(Paragraph("Índice de Contenidos", styles['heading1']))
+    elements.append(Spacer(1, 0.1 * inch))
+    elements.append(toc)
+    elements.append(PageBreak())
+
+    # Añadir sección de resumen y notas
+    _add_summary_section(elements, styles)
+
+    # Añadir sección de análisis de respuesta operativa (NUEVO)
+    _add_operational_analysis_section(elements, data, styles)
+
+    # Añadir sección principal de datos
+    _add_data_section(elements, data, styles)
+
+    # Generar el PDF con numeración de páginas
+    doc.multiBuild(elements, canvasmaker=NumberedCanvas)
+
+    return output_path
 
 
 def _add_report_header(elements, styles):
@@ -94,7 +85,7 @@ def _add_report_header(elements, styles):
         styles: Diccionario con los estilos del reporte
     """
     # Añadir título del reporte
-    report_title = Paragraph("Reporte de Tiempos de Estadía", styles['title'])
+    report_title = Paragraph("Reporte de Tiempos de Estadía", styles['report_title'])
     elements.append(report_title)
     elements.append(Spacer(1, 0.25 * inch))
 
@@ -105,21 +96,6 @@ def _add_report_header(elements, styles):
     elements.append(Spacer(1, 0.25 * inch))
 
 
-def _add_table_of_contents(elements, toc):
-    """
-    Añade la tabla de contenidos al reporte
-
-    Args:
-        elements: Lista donde se añaden los elementos
-        toc: Objeto de tabla de contenidos
-    """
-    toc_header = ChapterHeader("Índice de Contenidos", 1)
-    elements.append(toc_header)
-    elements.append(Spacer(1, 0.1 * inch))
-    elements.append(toc)
-    elements.append(PageBreak())
-
-
 def _add_summary_section(elements, styles):
     """
     Añade la sección de resumen y notas técnicas
@@ -128,7 +104,8 @@ def _add_summary_section(elements, styles):
         elements: Lista donde se añaden los elementos
         styles: Diccionario con los estilos del reporte
     """
-    summary_header = ChapterHeader("Resumen y Notas Técnicas", 1)
+    # Usar Paragraph en lugar de ChapterHeader para el título de la sección
+    summary_header = Paragraph("Resumen y Notas Técnicas", styles['heading1'])
     elements.append(summary_header)
     elements.append(Spacer(1, 0.2 * inch))
 
@@ -158,6 +135,59 @@ def _add_summary_section(elements, styles):
     elements.append(Spacer(1, 0.3 * inch))
 
     # Agregar una línea divisoria antes de los datos
+    divisor = create_divisor_line()
+    elements.append(divisor)
+    elements.append(Spacer(1, 0.3 * inch))
+
+
+def _add_operational_analysis_section(elements, data, styles):
+    """
+    Añade la sección de análisis de respuesta operativa con todos los afiliados
+
+    Args:
+        elements: Lista donde se añaden los elementos
+        data: Diccionario con los datos procesados
+        styles: Diccionario con los estilos del reporte
+    """
+    # Usar Paragraph en lugar de ChapterHeader para el título de la sección
+    operational_header = Paragraph("Análisis de la Respuesta Operativa", styles['heading1'])
+    elements.append(operational_header)
+    elements.append(Spacer(1, 0.2 * inch))
+
+    # Texto de introducción para la sección
+    intro_text = Paragraph(
+        "A continuación se presentan los datos relacionados con los afiliados y sus fechas de reporte "
+        "para este análisis de respuesta operativa.",
+        styles['info']
+    )
+    elements.append(intro_text)
+    elements.append(Spacer(1, 0.2 * inch))
+
+    # Extraer la lista de afiliados
+    operational_data = data.get('operational_data', {})
+    affiliates_list = operational_data.get('affiliates', [])
+
+    if not affiliates_list:
+        # Si no hay afiliados, agregar un mensaje
+        no_data_text = Paragraph("No se encontraron datos de afiliados en el archivo Excel.", styles['info'])
+        elements.append(no_data_text)
+    else:
+        # Crear datos para la tabla
+        table_data = [["Nombre del Afiliado", "Fecha de Reporte"]]
+
+        # Agregar cada afiliado a la tabla
+        for affiliate in affiliates_list:
+            nombre_afiliado = affiliate.get('Nombre del Afiliado', 'No especificado')
+            fecha_reporte = affiliate.get('Fecha de Reporte', 'No especificada')
+            table_data.append([nombre_afiliado, fecha_reporte])
+
+        # Crear tabla con los datos operativos
+        table = create_operational_data_table(table_data)
+        elements.append(table)
+
+    elements.append(Spacer(1, 0.3 * inch))
+
+    # Agregar una línea divisoria antes de la siguiente sección
     divisor = create_divisor_line()
     elements.append(divisor)
     elements.append(Spacer(1, 0.3 * inch))
@@ -195,16 +225,21 @@ def _add_data_section(elements, data, styles):
         data: Diccionario con los datos de los oficiales
         styles: Diccionario con los estilos del reporte
     """
-    data_header = ChapterHeader("Datos de Tiempos por Oficial Técnico", 1)
+    # Usar Paragraph en lugar de ChapterHeader para el título de la sección
+    data_header = Paragraph("Datos de Tiempos por Oficial Técnico", styles['heading1'])
     elements.append(data_header)
     elements.append(Spacer(1, 0.3 * inch))
 
     # Para cada oficial técnico, generar una sección con sus datos
     for i, (officer, officer_data) in enumerate(data.items()):
+        # Saltarse la clave 'operational_data' ya que no es un oficial técnico
+        if officer == 'operational_data':
+            continue
+
         _add_officer_section(elements, officer, officer_data, styles)
 
         # Añadir un salto de página después de cada oficial (excepto el último)
-        if i < len(data) - 1:
+        if i < len(data) - 2:  # Restamos 2 para contar con 'operational_data'
             elements.append(PageBreak())
 
 
@@ -219,7 +254,7 @@ def _add_officer_section(elements, officer, officer_data, styles):
         styles: Diccionario con los estilos del reporte
     """
     # Título de la sección (nombre del oficial)
-    officer_header = ChapterHeader(f"Oficial Técnico: {officer}", 2)
+    officer_header = Paragraph(f"Oficial Técnico: {officer}", styles['heading2'])
     elements.append(officer_header)
     elements.append(Spacer(1, 0.2 * inch))
 

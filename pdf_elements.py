@@ -1,131 +1,234 @@
 # pdf_elements.py
-# Módulo que contiene elementos personalizados para los reportes PDF como
-# encabezados de capítulo, elementos de tablas y otros componentes especiales
+# Módulo que contiene elementos específicos para la generación de PDF como encabezados, tablas y líneas divisorias
 
-from reportlab.platypus import Flowable, Table, TableStyle
+from reportlab.platypus import Paragraph, Table, TableStyle, Flowable
 from reportlab.lib import colors
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.units import inch
 
 
 class ChapterHeader(Flowable):
     """
-    Flowable personalizado para crear encabezados de capítulo con diseño técnico
+    Clase personalizada para crear encabezados de capítulos con niveles
     """
 
     def __init__(self, text, level=1):
         Flowable.__init__(self)
         self.text = text
-        self.level = level  # 1 para título principal, 2 para subtítulo, etc.
-
-    def draw(self):
-        # Configuración según el nivel
-        if self.level == 1:
-            # Título principal
-            self.canv.setFillColor(colors.HexColor('#2C3E50'))
-            self.canv.setFont('Helvetica-Bold', 16)
-            self.canv.drawString(0, 0, self.text)
-            # Línea debajo del título principal
-            self.canv.setStrokeColor(colors.HexColor('#3498DB'))
-            self.canv.setLineWidth(2)
-            self.canv.line(0, -6, 450, -6)
-        else:
-            # Subtítulo
-            self.canv.setFillColor(colors.HexColor('#34495E'))
-            self.canv.setFont('Helvetica-Bold', 14)
-            self.canv.drawString(0, 0, self.text)
+        self.level = level
+        self.paragraph = None  # Inicializamos el párrafo como None
+        # Definimos los estilos según el nivel
+        self.styles = {
+            1: ParagraphStyle(
+                name='Heading1',
+                fontName='Helvetica-Bold',
+                fontSize=16,
+                leading=18,
+                spaceAfter=10
+            ),
+            2: ParagraphStyle(
+                name='Heading2',
+                fontName='Helvetica-Bold',
+                fontSize=14,
+                leading=16,
+                spaceAfter=8,
+                leftIndent=10
+            ),
+            3: ParagraphStyle(
+                name='Heading3',
+                fontName='Helvetica-Bold',
+                fontSize=12,
+                leading=14,
+                spaceAfter=6,
+                leftIndent=20
+            )
+        }
 
     def wrap(self, availWidth, availHeight):
-        # Determinar altura basada en el nivel
-        if self.level == 1:
-            return (availWidth, 30)  # Título principal con espacio para línea
-        else:
-            return (availWidth, 20)  # Subtítulo
+        """
+        Determina las dimensiones requeridas para el flowable
+
+        Args:
+            availWidth: Ancho disponible
+            availHeight: Alto disponible
+
+        Returns:
+            Tupla (ancho, alto) requerido
+        """
+        # Creamos el párrafo aquí para asegurarnos de que esté inicializado
+        self.paragraph = Paragraph(self.text, self.styles[self.level])
+        self.width, self.height = self.paragraph.wrap(availWidth, availHeight)
+        return (self.width, self.height)
+
+    def draw(self):
+        """
+        Dibuja el flowable en el canvas
+        """
+        # Comprobamos que el párrafo esté inicializado
+        if self.paragraph is None:
+            self.paragraph = Paragraph(self.text, self.styles[self.level])
+            # Aseguramos que el párrafo ha sido dimensionado correctamente
+            self.paragraph.wrap(self.width, self.height)
+
+        # Dibujamos el párrafo
+        self.paragraph.drawOn(self.canv, 0, 0)
+
+        # Generar un ID único para este encabezado
+        key = f'h{self.level}-{hash(self.text)}'
+
+        # Crear el bookmark para la tabla de contenidos
+        # Esto solo marca la posición actual en el documento
+        self.canv.bookmarkPage(key)
+
+        # Añadir una entrada al esquema del documento
+        # Utilizamos 0 como nivel base y sumamos el nivel real
+        # para evitar saltos no permitidos
+        self.canv.addOutlineEntry(self.text, key, 0 + self.level)
 
 
 def create_divisor_line():
     """
-    Crea un elemento de tabla que sirve como línea divisoria
+    Crea una línea divisoria para separar secciones
 
     Returns:
-        Table: Un objeto tabla con líneas horizontales para separar contenido
+        Table: Un elemento de tabla con una línea divisoria
     """
-    divisor_style = TableStyle([
-        ('LINEABOVE', (0, 0), (-1, 0), 1, colors.HexColor('#CCCCCC')),
-        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#CCCCCC')),
-    ])
-    divisor = Table([['']],
-                    colWidths=[450],
-                    style=divisor_style)
-    return divisor
-
-
-def create_statistics_table(statistics_data, width_col1=2.5, width_col2=3):
-    """
-    Crea una tabla de estadísticas con estilo técnico
-
-    Args:
-        statistics_data: Lista de filas con datos estadísticos
-        width_col1: Ancho de la primera columna en pulgadas
-        width_col2: Ancho de la segunda columna en pulgadas
-
-    Returns:
-        Table: Un objeto tabla con estadísticas formateado con estilo técnico
-    """
-    stats_table = Table(statistics_data, colWidths=[width_col1 * 72, width_col2 * 72])  # Convertir a puntos
-    stats_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2980B9')),  # Azul header
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-        ('BACKGROUND', (0, 1), (0, -1), colors.HexColor('#ECF0F1')),  # Gris claro para primera columna
-        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#BDC3C7')),  # Gris para bordes
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    line_table = Table([['']], colWidths=[7.5 * inch], rowHeights=[1])
+    line_table.setStyle(TableStyle([
+        ('LINEBELOW', (0, 0), (0, 0), 1, colors.grey),
+        ('BOTTOMPADDING', (0, 0), (0, 0), 0),
+        ('TOPPADDING', (0, 0), (0, 0), 0),
     ]))
-    return stats_table
+    return line_table
 
 
-def create_detail_table(table_data, records, col_widths=None):
+def create_statistics_table(data):
     """
-    Crea una tabla detallada con datos de registros
+    Crea una tabla de estadísticas con diseño técnico
 
     Args:
-        table_data: Lista de filas con datos de la tabla
-        records: Lista de registros originales para determinar estilos
-        col_widths: Lista de anchos de columnas (opcional)
+        data: Lista de listas con datos para la tabla
 
     Returns:
-        Table: Un objeto tabla con datos detallados y formato técnico
+        Table: Tabla formatada con los datos
     """
-    if col_widths is None:
-        col_widths = [2 * 72, 2 * 72, 2 * 72]  # Convertir a puntos
+    # Crear tabla con ancho específico
+    table = Table(data, colWidths=[2.5 * inch, 4.0 * inch])
 
-    detail_table = Table(table_data, colWidths=col_widths)
-
-    # Estilo base de la tabla
-    table_style = [
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498DB')),  # Azul header
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+    # Estilo técnico para la tabla
+    table.setStyle(TableStyle([
+        # Encabezados
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, 0), 10),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 8),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#95A5A6')),  # Gris para bordes
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        # Contenido
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('TEXTCOLOR', (0, 1), (0, -1), colors.grey),
+        ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+        ('ALIGN', (0, 1), (0, -1), 'LEFT'),
+        ('FONTNAME', (1, 1), (1, -1), 'Helvetica'),
+        ('ALIGN', (1, 1), (1, -1), 'LEFT'),
+        # Bordes
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ]))
+
+    return table
+
+
+def create_detail_table(data, records):
+    """
+    Crea una tabla de registros detallados con formato técnico
+
+    Args:
+        data: Lista de listas con datos para la tabla
+        records: Datos originales de registros para personalización
+
+    Returns:
+        Table: Tabla formatada con los datos
+    """
+    # Crear tabla con ancho específico
+    table = Table(data, colWidths=[2.3 * inch, 2.3 * inch, 2.3 * inch])
+
+    # Estilo base para la tabla
+    style = [
+        # Encabezados
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        # Contenido
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        # Bordes
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
     ]
 
-    # Aplicar colores alternados y resaltar anomalías
+    # Personalización para registros con anomalías
     for i, record in enumerate(records, 1):
-        # Usar .get() con un valor predeterminado para evitar errores
-        es_tiempo_valido = record.get('Es tiempo válido', True)
+        if 'anomalía' in str(record.get('Tiempo de estadía', '')):
+            style.append(('TEXTCOLOR', (2, i), (2, i), colors.red))
+            style.append(('FONTNAME', (2, i), (2, i), 'Helvetica-Bold'))
 
-        if not es_tiempo_valido:
-            table_style.append(('BACKGROUND', (0, i), (-1, i), colors.HexColor('#F1948A')))  # Rojo suave
-            table_style.append(('TEXTCOLOR', (2, i), (2, i), colors.darkred))
-        else:
-            bg_color = colors.HexColor('#F2F4F6') if i % 2 == 0 else colors.white
-            table_style.append(('BACKGROUND', (0, i), (-1, i), bg_color))
+    table.setStyle(TableStyle(style))
+    return table
 
-    detail_table.setStyle(TableStyle(table_style))
-    return detail_table
+
+def create_operational_data_table(data):
+    """
+    Crea una tabla para mostrar los datos de análisis de respuesta operativa
+
+    Args:
+        data: Lista de listas con datos para la tabla
+
+    Returns:
+        Table: Tabla formateada con los datos operativos
+    """
+    # Determinar ancho de columnas basado en la cantidad de datos
+    if len(data) > 0 and len(data[0]) == 2:  # Para tabla de afiliados (2 columnas)
+        col_widths = [3.5 * inch, 3.5 * inch]
+    else:  # Para otros casos (por ejemplo, formato original)
+        col_widths = [2.5 * inch, 4.0 * inch]
+
+    # Crear tabla con ancho específico para datos operativos
+    table = Table(data, colWidths=col_widths)
+
+    # Estilo técnico para la tabla de datos operativos
+    table.setStyle(TableStyle([
+        # Encabezados
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),  # Diferente color para distinguir
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        # Contenido
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('TEXTCOLOR', (0, 1), (0, -1), colors.grey),
+        ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+        ('ALIGN', (0, 1), (0, -1), 'LEFT'),
+        ('FONTNAME', (1, 1), (1, -1), 'Helvetica'),
+        ('ALIGN', (1, 1), (1, -1), 'LEFT'),
+        # Bordes
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ]))
+
+    return table
