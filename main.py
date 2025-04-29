@@ -7,6 +7,7 @@ from gui import create_main_window
 from excel_processor import process_excel_file
 from pdf_generator import generate_pdf_report
 import os
+import traceback
 
 
 def main():
@@ -34,14 +35,15 @@ def process_data(excel_file_path, output_pdf_path=None):
         # Procesar el archivo Excel
         data = process_excel_file(excel_file_path)
 
+        # Verificar si hay datos después de procesar
         if not data:
-            messagebox.showerror("Error", "No se encontraron datos para procesar.")
+            messagebox.showwarning("Advertencia", "No se encontraron datos válidos para procesar en el archivo.")
             return
 
         # Si no se proporcionó una ruta de salida, solicitar al usuario que elija dónde guardar
         if not output_pdf_path:
             # Generar un nombre predeterminado basado en el archivo Excel
-            default_filename = os.path.splitext(os.path.basename(excel_file_path))[0] + ".pdf"
+            default_filename = os.path.splitext(os.path.basename(excel_file_path))[0] + "_reporte.pdf"
 
             # Abrir diálogo para seleccionar dónde guardar
             output_pdf_path = filedialog.asksaveasfilename(
@@ -60,8 +62,22 @@ def process_data(excel_file_path, output_pdf_path=None):
 
         messagebox.showinfo("Éxito", f"El informe PDF ha sido generado: {output_pdf_path}")
 
+    except ValueError as ve:
+        # Errores específicos de validación
+        messagebox.showerror("Error de Validación", str(ve))
     except Exception as e:
-        messagebox.showerror("Error", f"Ocurrió un error al procesar el archivo: {str(e)}")
+        # Registro del error completo para depuración
+        print(f"Error detallado: {traceback.format_exc()}")
+
+        # Mostrar mensaje de error amigable
+        messagebox.showerror(
+            "Error",
+            f"Ocurrió un error al procesar el archivo:\n{str(e)}\n\n"
+            "Verifique que:\n"
+            "- El archivo Excel esté correctamente formateado\n"
+            "- Tenga las columnas requeridas\n"
+            "- No esté dañado o bloqueado"
+        )
 
 
 if __name__ == "__main__":
