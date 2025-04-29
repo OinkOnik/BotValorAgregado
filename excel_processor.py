@@ -49,33 +49,58 @@ def process_excel_file(file_path):
 
         for officer, group in df_filtered.groupby('Nombre del oficial técnico que brinda servicio'):
             records = []
+            valid_records_seconds = []  # Lista para almacenar solo los tiempos válidos (positivos)
 
             for _, row in group.iterrows():
                 # Calcular tiempo de estadía en formato legible (horas y minutos)
                 tiempo_estadia = row['Tiempo de estadía']
-                horas = int(tiempo_estadia.total_seconds() // 3600)
-                minutos = int((tiempo_estadia.total_seconds() % 3600) // 60)
+                segundos_estadia = tiempo_estadia.total_seconds()
 
+                # Determinar si el tiempo es válido (positivo)
+                es_tiempo_valido = segundos_estadia > 0
+
+                horas = int(abs(segundos_estadia) // 3600)
+                minutos = int((abs(segundos_estadia) % 3600) // 60)
+
+                # Para tiempo negativo, agregar indicador
+                if segundos_estadia < 0:
+                    tiempo_texto = f"-{horas} horas, {minutos} minutos (anomalía)"
+                else:
+                    tiempo_texto = f"{horas} horas, {minutos} minutos"
+
+                # Agregar el registro a la lista de todos los registros
                 records.append({
                     'Hora de llegada': row['Hora de llegada'],
                     'Hora de salida': row['Hora de salida'],
-                    'Tiempo de estadía': f"{horas} horas, {minutos} minutos",
-                    'Tiempo de estadía (segundos)': tiempo_estadia.total_seconds()  # Para ordenar
+                    'Tiempo de estadía': tiempo_texto,
+                    'Tiempo de estadía (segundos)': segundos_estadia,  # Para ordenar
+                    'Es tiempo válido': es_tiempo_valido  # Para filtrar en estadísticas
                 })
+
+                # Si el tiempo es válido (positivo), agregarlo a la lista para estadísticas
+                if es_tiempo_valido:
+                    valid_records_seconds.append(segundos_estadia)
 
             # Ordenar por hora de llegada
             records.sort(key=lambda x: x['Hora de llegada'])
 
-            # Calcular estadísticas
-            total_seconds = sum(record['Tiempo de estadía (segundos)'] for record in records)
-            avg_seconds = total_seconds / len(records) if records else 0
+            # Calcular estadísticas solo con tiempos válidos
+            total_valid_records = len(valid_records_seconds)
+
+            if total_valid_records > 0:
+                total_seconds = sum(valid_records_seconds)
+                avg_seconds = total_seconds / total_valid_records
+            else:
+                total_seconds = 0
+                avg_seconds = 0
 
             avg_hours = int(avg_seconds // 3600)
             avg_minutes = int((avg_seconds % 3600) // 60)
 
             result[officer] = {
                 'records': records,
-                'total_records': len(records),
+                'total_records': len(records),  # Total de registros incluyendo anomalías
+                'valid_records': total_valid_records,  # Solo registros con tiempo positivo
                 'avg_time': f"{avg_hours} horas, {avg_minutes} minutos",
                 'total_time': format_seconds_to_time(total_seconds)
             }

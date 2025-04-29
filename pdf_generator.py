@@ -36,6 +36,12 @@ def generate_pdf_report(data, output_path):
     title_style = styles['Heading1']
     subtitle_style = styles['Heading2']
     normal_style = styles['Normal']
+    note_style = ParagraphStyle(
+        'NoteStyle',
+        parent=styles['Italic'],
+        fontSize=9,
+        textColor=colors.darkblue
+    )
 
     # Crear estilo para encabezados de tabla
     header_style = ParagraphStyle(
@@ -58,6 +64,14 @@ def generate_pdf_report(data, output_path):
     elements.append(date_text)
     elements.append(Spacer(1, 0.25 * inch))
 
+    # Añadir nota sobre anomalías
+    anomaly_note = Paragraph(
+        "Nota: Las anomalías (tiempos negativos) se muestran en los registros pero no se incluyen en los cálculos de tiempo total y promedio.",
+        note_style
+    )
+    elements.append(anomaly_note)
+    elements.append(Spacer(1, 0.25 * inch))
+
     # Para cada oficial técnico, generar una sección con sus datos
     for officer, officer_data in data.items():
         # Título de la sección (nombre del oficial)
@@ -68,12 +82,14 @@ def generate_pdf_report(data, output_path):
         # Resumen de estadísticas
         statistics = [
             ["Total de registros:", str(officer_data['total_records'])],
-            ["Tiempo total:", officer_data['total_time']],
-            ["Tiempo promedio:", officer_data['avg_time']]
+            ["Registros válidos:", str(officer_data['valid_records'])],
+            ["Registros con anomalías:", str(officer_data['total_records'] - officer_data['valid_records'])],
+            ["Tiempo total (solo válidos):", officer_data['total_time']],
+            ["Tiempo promedio (solo válidos):", officer_data['avg_time']]
         ]
 
         # Tabla de estadísticas
-        stats_table = Table(statistics, colWidths=[2 * inch, 3 * inch])
+        stats_table = Table(statistics, colWidths=[2.5 * inch, 3 * inch])
         stats_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
             ('TEXTCOLOR', (0, 0), (0, -1), colors.black),
@@ -104,14 +120,18 @@ def generate_pdf_report(data, output_path):
                 salida = record['Hora de salida'].strftime("%d/%m/%Y %H:%M:%S")
                 estadia = record['Tiempo de estadía']
 
-                table_data.append([llegada, salida, estadia])
+                # Determinar color de fila según si es válido o no
+                row_data = [llegada, salida, estadia]
+                table_data.append(row_data)
 
             # Combinar encabezados y datos
             all_data = table_headers + table_data
 
             # Crear tabla
             detail_table = Table(all_data, colWidths=[2 * inch, 2 * inch, 2 * inch])
-            detail_table.setStyle(TableStyle([
+
+            # Base style
+            table_style = [
                 # Estilo para los encabezados
                 ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -125,10 +145,22 @@ def generate_pdf_report(data, output_path):
                 ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
 
-                # Bordes y colores alternados en filas
+                # Bordes
                 ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
-            ]))
+            ]
+
+            # Colores alternados para filas normales, color distinto para anomalías
+            for i, record in enumerate(officer_data['records'], 1):
+                if not record.get('Es tiempo válido', True):
+                    table_style.append(('BACKGROUND', (0, i), (-1, i), colors.mistyrose))
+                    table_style.append(('TEXTCOLOR', (2, i), (2, i), colors.red))
+                else:
+                    if i % 2 == 0:
+                        table_style.append(('BACKGROUND', (0, i), (-1, i), colors.lightgrey))
+                    else:
+                        table_style.append(('BACKGROUND', (0, i), (-1, i), colors.white))
+
+            detail_table.setStyle(TableStyle(table_style))
             elements.append(detail_table)
 
         # Espaciador entre secciones
