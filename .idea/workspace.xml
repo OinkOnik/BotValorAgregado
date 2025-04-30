@@ -4,12 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="43b30518-c394-4bf2-a03d-9d28a3152428" name="Changes" comment="Mejoramiento de la interfaz grafica para que tenga un diseno estandar">
+    <list default="true" id="43b30518-c394-4bf2-a03d-9d28a3152428" name="Changes" comment="Actualizacion del bot para incluir una nueva seccion">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/excel_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/excel_processor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pdf_canvas.py" beforeDir="false" afterPath="$PROJECT_DIR$/pdf_canvas.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pdf_elements.py" beforeDir="false" afterPath="$PROJECT_DIR$/pdf_elements.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pdf_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/pdf_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pdf_styles.py" beforeDir="false" afterPath="$PROJECT_DIR$/pdf_styles.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,7 +118,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745960247048</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Actualizacion del bot para incluir una nueva seccion">
+      <option name="closed" value="true" />
+      <created>1745966486487</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1745966486487</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -136,6 +146,7 @@
     <MESSAGE value="Primera version estable del bot" />
     <MESSAGE value="Mejoramiento definitivo del PDF" />
     <MESSAGE value="Mejoramiento de la interfaz grafica para que tenga un diseno estandar" />
-    <option name="LAST_COMMIT_MESSAGE" value="Mejoramiento de la interfaz grafica para que tenga un diseno estandar" />
+    <MESSAGE value="Actualizacion del bot para incluir una nueva seccion" />
+    <option name="LAST_COMMIT_MESSAGE" value="Actualizacion del bot para incluir una nueva seccion" />
   </component>
 </project>

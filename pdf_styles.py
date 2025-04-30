@@ -1,5 +1,12 @@
 # pdf_styles.py
-# Módulo que define los estilos para el documento PDF, incluyendo fuentes, tamaños, colores y alineaciones
+"""
+Módulo que define todos los estilos y la apariencia visual para los reportes PDF generados.
+
+Este módulo centraliza la definición de estilos para textos, párrafos, encabezados y otros
+elementos visuales utilizados en los reportes PDF. Mantener los estilos en un módulo
+separado facilita la consistencia visual y permite modificar la apariencia de los reportes
+sin cambiar la lógica de generación de contenido.
+"""
 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors

@@ -1,5 +1,9 @@
 # main.py
-# Archivo principal que ejecuta la aplicación del Bot para procesar datos Excel y generar informes PDF
+"""
+Módulo principal del Visor Técnico Bot que coordina todos los componentes de la aplicación.
+Inicia la interfaz gráfica, gestiona el procesamiento de archivos Excel y la generación
+de reportes PDF con análisis detallados de tiempos de estadía y respuesta operativa.
+"""
 
 import tkinter as tk
 from gui import create_main_window

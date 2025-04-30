@@ -1,6 +1,9 @@
 # excel_processor.py
-# Módulo para procesar archivos Excel y extraer/calcular datos de tiempo de manera robusta,
-# incluyendo análisis de respuesta operativa
+"""
+Módulo especializado en procesar archivos Excel para el análisis de tiempos de estadía.
+Calcula métricas como tiempo promedio y total por oficial técnico, detecta anomalías en registros
+y extrae información de afiliados para el análisis de respuesta operativa.
+"""
 
 import pandas as pd
 from datetime import datetime, timedelta

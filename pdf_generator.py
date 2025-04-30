@@ -1,6 +1,9 @@
 # pdf_generator.py
-# Módulo principal para generar reportes PDF con diseño técnico y profesional, coordinando
-# los diferentes componentes de generación de PDF como estilos, elementos y manejo de canvas
+"""
+Módulo encargado de generar reportes PDF profesionales con diseño técnico avanzado.
+Crea documentos estructurados con índice, estadísticas, tablas de datos detallados por oficial técnico
+y análisis de respuesta operativa, usando estilos personalizados y elementos gráficos profesionales.
+"""
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter

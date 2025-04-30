@@ -1,6 +1,11 @@
 # pdf_canvas.py
-# Módulo que contiene clases personalizadas para Canvas de reportlab, específicamente
-# para manejar pies de página, numeración y otras características avanzadas del canvas
+"""
+Módulo que implementa un canvas personalizado para ReportLab con numeración automática de páginas
+y encabezados/pies de página profesionales.
+
+Este módulo extiende la funcionalidad del canvas estándar de ReportLab para incluir numeración
+automática de páginas y elementos gráficos consistentes en todas las páginas del reporte PDF.
+"""
 
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib import colors

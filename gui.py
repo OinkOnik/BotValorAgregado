@@ -1,6 +1,9 @@
 # gui.py
-# Módulo que contiene la interfaz gráfica para seleccionar archivos Excel y mostrar información
-# con un diseño moderno y profesional
+"""
+Módulo que implementa la interfaz gráfica del Visor Técnico Bot con diseño moderno y profesional.
+Permite al usuario seleccionar archivos Excel, visualizar el estado del procesamiento y
+genera reportes PDF con análisis de tiempos de estadía de oficiales técnicos.
+"""
 
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox

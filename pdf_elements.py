@@ -1,5 +1,12 @@
 # pdf_elements.py
-# Módulo que contiene elementos específicos para la generación de PDF como encabezados, tablas y líneas divisorias
+"""
+Módulo que proporciona elementos visuales y tablas formateadas para la generación de reportes PDF.
+
+Este módulo contiene funciones que crean elementos visuales como líneas divisorias,
+tablas estadísticas y tablas de datos detallados con estilos profesionales y técnicos.
+Estos elementos son utilizados por el generador principal de PDF para crear reportes
+con un diseño consistente y atractivo.
+"""
 
 from reportlab.platypus import Paragraph, Table, TableStyle, Flowable
 from reportlab.lib import colors
